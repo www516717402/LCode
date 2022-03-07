@@ -13,25 +13,110 @@ class Node:
             self._pre_node = pre_node
         if next_node is not None:
             self._next_node = next_node
+    
+    def _unlink(self):
+        pre_node = self._pre_node
+        next_node = self._next_node
+        
+        pre_node._next_node = next_node
+        if next_node is not None:
+            next_node._pre_node = pre_node
 
     def __repr__(self) -> str:
         return self._data
 
 
 class SingleLinkedList():
-    def __init__(self) -> None:
-        self.root = None
-        self.size = 0
+    def __init__(self, iter_data=None) -> None:
+        self.root = Node()
+        self.length = 0
+        if iter_data is not None:
+            self.add_iter(iter_data)
+ 
+    def __len__(self):
+        return self.length
+    
+    def add(self, data, tail=True):
+        start = self.root
+        orient, oppsite = '_next_node', '_pre_node'
+        if not tail:
+            orient, oppsite = oppsite, orient
+        while getattr(start, orient):
+            start = getattr(start, orient)
+        self._add_node(start, data)
+        self.length += 1
 
-    def add(self):
-        pass
+    def add_iter(self, iter_data, tail=True):
+        for data in iter_data:
+            self.add(data, tail)
+    
+    # only support insert by tail
+    def _add_node(self, node, data):
+        new_node = Node(data=data, pre_node=node)
+        if node._next_node is not None:
+            node._next_node._pre_node = new_node
+            new_node._next_node = node._next_node
+        node._next_node = new_node
+    
+    def remove(self, data=None, item=None):
+        if data is not None:
+            self._remove_data(data)
+        elif item is not None:
+            self._remove_item(item)
+        else:
+            pass
 
-    def remove(self):
-        pass
+    def _remove_data(self, data):
+        start = self.root
+        orient = '_next_node'
+        while getattr(start, orient):
+            if start._data == data:
+                self._remove_node(start)
+                self.length -= 1
+                break
+            start = getattr(start, orient)
+    
+    def _remove_item(self, item):
+        if not (item >= 0 and item < self.length):
+            return
+        start = self.root
+        orient = '_next_node'
+        cur_item = 0
+        for cur_item in range(self.length + 1):
+            if cur_item == item + 1:
+                self._remove_node(start)
+                self.length -= 1
+                break
+            start = getattr(start, orient)
 
-    def insert(self):
-        pass
+    def _remove_node(self, node):
+        node._unlink()
+        del node
+    
+    def insert(self, item, data):
+        if not (item >= 0 and item <= self.length):
+            return
+        start = self.root
+        orient = '_next_node'
+        for cur_item in range(self.length+1):
+            if cur_item == item:
+                self._add_node(start, data)
+                self.length += 1
+                break
+            start = getattr(start, orient)
 
-    def show(self):
-        pass
+    def show(self, tail=True):
+        start = self.root
+        orient, oppsite = '_next_node', '_pre_node'
+        if not tail:
+            orient, oppsite = oppsite, orient
+        while getattr(start, orient):
+            start = getattr(start, orient)
+            print(f'\ndata --> {start._data}')
 
+if __name__ == '__main__':
+    link = SingleLinkedList()
+    link.add_iter([0,2,3,10,1], tail=True)
+    link.remove(data=10)
+    link.show()
+    
