@@ -1,3 +1,5 @@
+from re import X
+
 
 class TreeNode(object):
     def __init__(self, val) -> None:
@@ -10,9 +12,9 @@ def inorderTraversal(root):
     def in_order(root):
         if not root:
             return
-        yield root.val
         yield from in_order(root.left)
         yield from in_order(root.right)
+        yield root.val
 
     return [i for i in in_order(root)]
 
